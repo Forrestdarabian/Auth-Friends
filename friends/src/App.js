@@ -1,38 +1,36 @@
 import React from 'react';
-import Login from './Login';
-import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+import Login from './components/Login.js';
+import Friends from './components/Friends.js';
+import { Route, Link, Redirect } from 'react-router-dom';
 
-
-const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route
-    {...rest}
-    render={props =>
-      localStorage.getItem("token") ? (
-        <Component {...props} />
-      ) : (
-        <Redirect to="/login" />
-      )
+const ProtectedRoute = ({component: Component, ...rest}) => {
+  // const propsWithoutComponent = {...props, component: undefined};
+  return <Route {...rest} render={props => {
+    if (localStorage.getItem('token')) {
+      return <Component {...props} />;
+    } else {
+      return <Redirect to="/login"/>;
     }
-  />
-);
+  }}/>;
+};
+
+const protectRoute = Component => props => {
+  if (localStorage.getItem('token')) {
+    return <Component {...props} />;
+  } else {
+    return <Redirect to="/login"/>;
+  }
+};
+
+const ProtectedFriends = protectRoute(Friends);
 
 function App() {
   return (
-    <div>
-      <ul>
-        {/* <li>
-          <Link to="/public">Public Page</Link>
-        </li>
-        <li>
-          <Link to="/protected">Protected Page</Link>
-        </li> */}
-      </ul>
-      {/* <Route path="/public" component={Public} /> */}
+    <div className="App">
       <Route path="/login" component={Login} />
-      {/* <PrivateRoute path='/protected' component={Protected} /> */}
-
+      <ProtectedRoute path="/friends" component={Friends}/>
+      {/* <Route path="/friends" component={ProtectedFriends}/> */}
     </div>
   );
 }
